@@ -1,0 +1,13 @@
+﻿<Window x:Class="BoardGameDesigner.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Board Game Designer" Height="252" Width="495">
+    <Grid>
+        <Button x:Name="btnLoadProject" Content="Load Project" HorizontalAlignment="Left" Margin="29,24,0,0" VerticalAlignment="Top" Width="100" RenderTransformOrigin="0.52,0.273" Click="btnLoadProject_Click"/>
+        <ListBox x:Name="lstRecentProjects" HorizontalAlignment="Left" Height="100" Margin="29,65,0,0" VerticalAlignment="Top" Width="300"/>
+        <Button x:Name="btnNewProject" Content="New Project" HorizontalAlignment="Left" Margin="146,24,0,0" VerticalAlignment="Top" Width="100" Click="btnNewProject_Click"/>
+        <Button x:Name="btnTest" Content="Test Save" HorizontalAlignment="Left" Margin="264,24,0,0" VerticalAlignment="Top" Width="75" Click="btnTest_Click"/>
+        <Button x:Name="btnTestLoad" Content="Test Load" HorizontalAlignment="Left" Margin="364,24,0,0" VerticalAlignment="Top" Width="75" Click="btnTestLoad_Click" RenderTransformOrigin="1.827,0.591"/>
+
+    </Grid>
+</Window>

@@ -1,0 +1,39 @@
+﻿<Window x:Name="wndMain" x:Class="BoardGameDesigner.ProjectManager"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Project Manager" Height="696" Width="1050" Closing="wndProjectManager_Closing" ResizeMode="CanMinimize" Background="#FFB8B4B4" Foreground="{x:Null}" WindowStartupLocation="CenterScreen">
+    <Window.CommandBindings>
+        <CommandBinding Command="Refresh" Executed="CommandBinding_Refresh" />
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Key="F5" Command="Refresh" />
+    </Window.InputBindings>
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo Description="Board Game Design Manager"/>
+    </Window.TaskbarItemInfo>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition AllowDrop="False" Width="300" />
+            <ColumnDefinition AllowDrop="True" Width="750" />
+        </Grid.ColumnDefinitions>
+        <Menu x:Name="mnuMain" IsMainMenu="True" Height="20" VerticalAlignment="Top" Grid.ColumnSpan="2">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New Project" Click="mnuMain_CreateNewProject" />
+                <MenuItem Header="_Save Project" Click="mnuMain_SaveProject" />
+                <MenuItem Header="_Load Project" Click="mnuMain_LoadProject" />
+                <MenuItem Header="_Close Project" Click="mnuMain_CloseProject" />
+                <MenuItem Header="_Load Sample Data" Click="mnuMain_CreateSampleProject" />
+                <Separator />
+                <MenuItem Header="_Refresh View" Command="Refresh" InputGestureText="F5" />
+                <Separator />
+                <MenuItem Header="_Exit" Click="mnuMain_ExitApplication" />                
+            </MenuItem>
+        </Menu>
+        <TreeView x:Name="tvElementView" HorizontalAlignment="Left" Height="646" VerticalAlignment="Top" Width="300" Margin="0,20,0,0" Visibility="Hidden" ContextMenuOpening="tvElementView_ContextMenuOpening" Grid.Column="0" AllowDrop="True" >
+            <TreeView.ContextMenu>
+                <ContextMenu />
+            </TreeView.ContextMenu>
+        </TreeView>
+        <ContentControl x:Name="ccUserControl" Content="ContentControl" Grid.Column="1" HorizontalAlignment="Left" Margin="0,20,0,0" VerticalAlignment="Top" Height="648" Width="736" AllowDrop="True" Drop="ccUserControl_Drop" DragOver="ccUserControl_DropOver" />
+    </Grid>
+</Window>
