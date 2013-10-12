@@ -38,6 +38,7 @@ namespace BoardGameDesigner.Designs
             Width = img.Width;
             Height = img.Height;
         }
+
         public override void Draw(DrawingContext context)
         {
             context.DrawImage(Image, new Rect(Origin.X, Origin.Y, Height, Width));            

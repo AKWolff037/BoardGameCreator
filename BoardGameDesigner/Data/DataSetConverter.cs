@@ -42,10 +42,17 @@ namespace BoardGameDesigner.Data
         }
         public static XElement ConvertDataColumnToXmlElement(DataColumn dc)
         {
-            var element = new XElement("Column", dc.ColumnName);
-            element.SetAttributeValue("DataType", dc.DataType);
-            element.SetAttributeValue("Ordinal", dc.Ordinal);
-            return element;
+            if (dc != null)
+            {
+                var element = new XElement("Column", dc.ColumnName);
+                element.SetAttributeValue("DataType", dc.DataType);
+                element.SetAttributeValue("Ordinal", dc.Ordinal);
+                return element;
+            }
+            else
+            {
+                return null;
+            }
         }
         public static XElement ConvertDataRowToXmlElement(DataRow drow)
         {

@@ -52,26 +52,36 @@ namespace BoardGameDesigner.Designs
         public override XElement ToXmlElement()
         {
             var condElement = new XElement("SimpleCondition");
-            var colElement = Data.DataSetConverter.ConvertDataColumnToXmlElement(ComparisonColumn);
-            var compareValElement = new XElement("CompareValue", CompareValue);
-            compareValElement.SetAttributeValue("Type", CompareValueType.ToString());
+            if (ComparisonColumn != null)
+            {
+                var colElement = Data.DataSetConverter.ConvertDataColumnToXmlElement(ComparisonColumn);
+                condElement.Add(colElement);
+            }
+            if (CompareValue != null)
+            {
+                var compareValElement = new XElement("CompareValue", CompareValue);
+                compareValElement.SetAttributeValue("Type", CompareValueType.ToString());
+                condElement.Add(compareValElement);
+            }
             var operatorElement = new XElement("Operator", Operator);
-            var typeElement = new XElement("Type", CompareType);
-            condElement.Add(colElement);
-            condElement.Add(compareValElement);
             condElement.Add(operatorElement);
+            var typeElement = new XElement("Type", CompareType);
             condElement.Add(typeElement);
+            
             return condElement;
         }
         public override IO.IXmlElementConvertible FromXmlElement(XElement element)
         {
             var ownerTable = OwnerElement.DataSource;
-            var compareColumn = Data.DataSetConverter.ConvertDataColumnFromXmlElement(element.Element("Column"));
-            ComparisonColumn = ownerTable.Columns[compareColumn.ColumnName];            
-            CompareValue = element.Element("CompareValue").Value;
-            CompareValueType = System.Type.GetType(element.Element("CompareValue").Attribute("Type").Value);            
-            Operator = (ConditionalOperator)Enum.Parse(typeof(ConditionalOperator), element.Element("Operator").Value);
-            CompareType = (ComparisonType)Enum.Parse(typeof(ComparisonType), element.Element("Type").Value);
+            if (ownerTable != null)
+            {
+                var compareColumn = Data.DataSetConverter.ConvertDataColumnFromXmlElement(element.Element("Column"));
+                ComparisonColumn = ownerTable.Columns[compareColumn.ColumnName];
+                CompareValue = element.Element("CompareValue").Value;
+                CompareValueType = System.Type.GetType(element.Element("CompareValue").Attribute("Type").Value);
+                Operator = (ConditionalOperator)Enum.Parse(typeof(ConditionalOperator), element.Element("Operator").Value);
+                CompareType = (ComparisonType)Enum.Parse(typeof(ComparisonType), element.Element("Type").Value);
+            }
             return this;
         }
     }

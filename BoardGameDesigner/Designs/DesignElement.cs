@@ -74,5 +74,13 @@ namespace BoardGameDesigner.Designs
             Origin = new Rect(x, y, height, width);
             Condition = Designs.Condition.ParseElement(this, element);
         }
+        public void Remove()
+        {
+            this.Condition = null;
+            this.ValueSource = null;
+            this.Layer = -1;
+            this.DataSource = null;
+            this.Design.DesignElements.Remove(this);
+        }
     }
 }

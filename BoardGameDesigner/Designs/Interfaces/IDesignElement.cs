@@ -8,9 +8,10 @@ using System.Windows.Media;
 using System.Xml.Linq;
 using BoardGameDesigner.IO;
 using System.Windows;
+using System.Windows.Media.Imaging;
 namespace BoardGameDesigner.Designs
 {
-    public interface IDesignElement : IXmlElementConvertible, INameable, IToggleable
+    public interface IDesignElement : IXmlElementConvertible, INameable, IToggleable, IRemovable
     {
         IDesign Design { get; set; }
         ICondition Condition { get; set; }

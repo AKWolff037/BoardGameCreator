@@ -267,6 +267,7 @@ namespace BoardGameDesigner
             }
             if (isDesign)
             {
+                AddPreviewItem(contextMenu);
                 AddSetTemplateItem(contextMenu);
                 AddNewImageElementItem(contextMenu);
                 AddNewTextElementItem(contextMenu);
@@ -287,7 +288,7 @@ namespace BoardGameDesigner
             }
             if (isImage)
             {
-                AddOpenItem(contextMenu);
+                AddOpenItem(contextMenu);                
             }
 
             AddRefreshItem(contextMenu);
@@ -302,6 +303,12 @@ namespace BoardGameDesigner
             menu.Items.Add(enableItem);
             menu.Items.Add(new Separator());
 
+        }
+        private void AddPreviewItem(ContextMenu menu)
+        {
+            var prevItem = new MenuItem() { Header = "Preview" };
+            prevItem.Click += tvElementView_PreviewItem;
+            menu.Items.Add(prevItem);
         }
 
         private void AddOpenItem(ContextMenu menu)
@@ -369,6 +376,13 @@ namespace BoardGameDesigner
         }
 
         #region Context Menu Event Handlers
+        private void tvElementView_PreviewItem(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = (tvElementView.SelectedItem as FrameworkElement).DataContext;
+            if (selectedItem == null)
+                return;
+            OpenItemPreview(selectedItem);
+        }
         private void tvElementView_ToggleItem(object sender, RoutedEventArgs e)
         {
             var selectedItem = (tvElementView.SelectedItem as FrameworkElement).DataContext;
@@ -438,14 +452,21 @@ namespace BoardGameDesigner
                     RefreshTreeView();
                 }
             }
-            //TODO: Create an input box for the user to enter a new name for the object;
         }
 
         private void tvElementView_DeleteItem(object sender, RoutedEventArgs e)
         {
+            var selectedItem = (tvElementView.SelectedItem as FrameworkElement).DataContext;
+            if (selectedItem == null)
+            {
+                return;
+            }
+            if (!(selectedItem is IRemovable))
+                return;
             if (MessageBox.Show("Are you sure you want to remove this item?", "Confirm Removal", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
             {
-                MessageBox.Show("You tried to remove " + tvElementView.SelectedItem.ToString());
+                    (selectedItem as IRemovable).Remove();
+                RefreshTreeView();
             }
         }
 
@@ -542,7 +563,16 @@ namespace BoardGameDesigner
             }
             ccUserControl.AllowDrop = true;
         }
-
+        private void OpenItemPreview(object item)
+        {
+            if (!(item is IDesign))
+                return;
+            var design = item as IDesign;
+            var image = design.DrawImage();
+            var ucContent = new UserControls.ucDesignEditor(design);
+            ucContent.PreviewFirstItem();
+            ccUserControl.Content = ucContent;
+        }
         private void OpenItem(object item)
         {
             UserControl ucContent = null;
@@ -556,7 +586,7 @@ namespace BoardGameDesigner
             }
             else if (item is IDesign)
             {
-                ucContent = new UserControls.ucDesignEditor(item);
+                ucContent = new UserControls.ucDesignEditor(item as IDesign);
             }
             else if (item is DataSet)
             {

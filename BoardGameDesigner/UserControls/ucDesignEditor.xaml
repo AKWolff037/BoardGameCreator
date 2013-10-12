@@ -5,7 +5,21 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              Height="648" Width="729" AllowDrop="True">
-    <Grid>
-            
+    <Grid x:Name="grdMain">
+        <Canvas x:Name="cvsMain" Height="648" Width="729" VerticalAlignment="Top" HorizontalAlignment="Left" SnapsToDevicePixels="True" ClipToBounds="True" IsHitTestVisible="True">
+            <Image x:Name="imgTemplate" Height="648" Source="{Binding Template}">
+                <Image.ContextMenu>
+                    <ContextMenu>
+                        <ContextMenu.Items>
+                            <MenuItem Name="mnuAddNewImageElement" Click="mnuAddNewImageElement_Click" Header="Add New Image Element" />
+                            <MenuItem Name="mnuAddNewTextElement" Click="mnuAddNewTextElement_Click" Header="Add New Text Element" />
+                            <MenuItem Name="mnuSetTemplate" Click="mnuSetTemplate_Click" Header="Set Template" />
+                            <Separator />
+                            <MenuItem Name="mnuPreview" Click="mnuPreviewFirstRow" Header="Preview First Row" />
+                        </ContextMenu.Items>
+                    </ContextMenu>
+                </Image.ContextMenu>
+            </Image>
+        </Canvas>
     </Grid>
 </UserControl>

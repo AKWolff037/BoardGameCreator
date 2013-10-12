@@ -42,45 +42,32 @@ namespace BoardGameDesigner.Designs
             DesignManager = manager;
             Enabled = true;
         }
-        public void Draw()
+        public void Remove()
         {
-            if (Template == null)
+            foreach (var elem in DesignElements)
             {
-                throw new InvalidOperationException("Cannot draw on Design without a template.");
+                elem.Remove();
             }
-            var sortedElements = DesignElements.OrderBy(elem => elem.Layer);
-            //var graphics = Graphics.FromImage(Template);
-            //foreach (var elem in sortedElements)
-            //{
-            //    elem.Draw(graphics);
-            //}
+            Template = null;
+            this.DesignManager.Designs.Remove(this);            
         }
-        public BitmapImage DrawImage()
+        public RenderTargetBitmap DrawImage()
         {
             var drawingVisual = new DrawingVisual();
             var drawingContext = drawingVisual.RenderOpen();
             if (Template != null)
             {
-                drawingContext.DrawImage(Template, new Rect(0, 0, Template.Width, Template.Height));                
+                drawingContext.DrawImage(Template, new Rect(0, 0, Template.Width, Template.Height));
                 var sortedElements = DesignElements.Where(elem => elem.Enabled).OrderBy(elem => elem.Layer);
-                foreach(var elem in sortedElements)
+                foreach (var elem in sortedElements)
                 {
                     elem.Draw(drawingContext);
                 }
                 drawingContext.Close();
-                var render = new RenderTargetBitmap(Template.PixelWidth, Template.PixelHeight, 300, 300, PixelFormats.Default);
-                render.Render(drawingVisual);
-                var formatter = new FormatConvertedBitmap();
-                formatter.Source = render;
-                formatter.DestinationFormat = PixelFormats.Cmyk32;
 
-                PngBitmapEncoder png = new PngBitmapEncoder();
-                png.Frames.Add(BitmapFrame.Create(formatter));
-                var imgStream = new System.IO.MemoryStream();
-                png.Save(imgStream);
-                var finalImage = new BitmapImage();
-                finalImage.StreamSource = imgStream;
-                return finalImage;
+                var render = new RenderTargetBitmap(Template.PixelWidth, Template.PixelHeight, 300, 300, PixelFormats.Default);
+                render.Render(drawingVisual);                
+                return render;
             }
             else
             {

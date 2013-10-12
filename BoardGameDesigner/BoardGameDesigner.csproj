@@ -13,6 +13,8 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -35,6 +37,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accessibility" />
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationUI, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="ReachFramework" />
     <Reference Include="System" />
@@ -61,7 +66,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Designs\IToggleable.cs" />
+    <Compile Include="Designs\Interfaces\IRemovable.cs" />
+    <Compile Include="Designs\Interfaces\IToggleable.cs" />
+    <Compile Include="Lib\ThumbEvents.cs" />
+    <Compile Include="Styles\DesignElementStyle.cs" />
+    <Compile Include="Lib\MoveThumb.cs" />
+    <Compile Include="Lib\ResizeThumb.cs" />
+    <Compile Include="Lib\SizeAdorner.cs" />
+    <Compile Include="Styles\MoveThumbStyle.cs" />
+    <Compile Include="Styles\ResizeControlStyle.cs" />
+    <Compile Include="Styles\ThumbEllipseStyle.cs" />
     <Compile Include="UserControls\ucBindToDataSet.xaml.cs">
       <DependentUpon>ucBindToDataSet.xaml</DependentUpon>
     </Compile>
@@ -102,13 +116,13 @@
     <Compile Include="Designs\DesignElement.cs" />
     <Compile Include="Designs\DesignManager.cs" />
     <Compile Include="Conditions\ICondition.cs" />
-    <Compile Include="Designs\IDesign.cs" />
-    <Compile Include="Designs\IDesignElement.cs" />
-    <Compile Include="Designs\IDesignManager.cs" />
-    <Compile Include="Designs\IImageDesignElement.cs" />
+    <Compile Include="Designs\Interfaces\IDesign.cs" />
+    <Compile Include="Designs\Interfaces\IDesignElement.cs" />
+    <Compile Include="Designs\Interfaces\IDesignManager.cs" />
+    <Compile Include="Designs\Interfaces\IImageDesignElement.cs" />
     <Compile Include="Designs\ImageDesignElement.cs" />
-    <Compile Include="Designs\INameable.cs" />
-    <Compile Include="Designs\ITextDesignElement.cs" />
+    <Compile Include="Designs\Interfaces\INameable.cs" />
+    <Compile Include="Designs\Interfaces\ITextDesignElement.cs" />
     <Compile Include="Conditions\OrCondition.cs" />
     <Compile Include="Conditions\SimpleCondition.cs" />
     <Compile Include="Designs\TextDesignElement.cs" />
@@ -122,6 +136,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="ProjectManager.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\DesignerControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -177,6 +195,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -186,8 +205,8 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
