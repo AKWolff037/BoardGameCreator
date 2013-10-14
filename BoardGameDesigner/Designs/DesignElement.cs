@@ -15,13 +15,19 @@ namespace BoardGameDesigner.Designs
     {
         internal DesignElement(IDesign design)
         {
+            Name = "New Design Element";
             Design = design;
             Enabled = true;
+            Size = new Size(30, 30);
+            X_Offset = 0;
+            Y_Offset = 0;
         }
         public string Name { get; set; }
         public virtual DataTable DataSource { get; set; }
         public virtual int Layer { get; set; }
-        public virtual Rect Origin { get; set; }
+        public virtual double X_Offset { get; set; }
+        public virtual double Y_Offset { get; set; }
+        public virtual Size Size { get; set; }
         public virtual IDesign Design { get; set; }
         public virtual ICondition Condition { get; set; }
         public virtual DataColumn ValueSource { get; set; }
@@ -46,7 +52,9 @@ namespace BoardGameDesigner.Designs
             }
             element.Add(new XElement("Layer", Layer));
             element.Add(new XElement("Enabled", Enabled));
-            element.Add(new XElement("Origin", Origin.X + "," + Origin.Y + "," + Origin.Height + "," + Origin.Width));
+            element.Add(new XElement("X_Offset", X_Offset));
+            element.Add(new XElement("Y_Offset", Y_Offset));
+            element.Add(new XElement("Size", new XElement("Width", Size.Width), new XElement("Height", Size.Height)));
         }
         public void LoadBasePropertiesFromXmlElement(XElement element)
         {
@@ -66,12 +74,9 @@ namespace BoardGameDesigner.Designs
             }
             Layer = int.Parse(element.Element("Layer").Value);
             Enabled = bool.Parse(element.Element("Enabled").Value);
-            var points = element.Element("Origin").Value.Split(',');
-            var x = double.Parse(points[0]);
-            var y = double.Parse(points[1]);
-            var height = double.Parse(points[2]);
-            var width = double.Parse(points[3]);
-            Origin = new Rect(x, y, height, width);
+            X_Offset = double.Parse(element.Element("X_Offset").Value);
+            Y_Offset = double.Parse(element.Element("Y_Offset").Value);
+            Size = new Size(double.Parse(element.Element("Size").Element("Width").Value), double.Parse(element.Element("Size").Element("Height").Value));
             Condition = Designs.Condition.ParseElement(this, element);
         }
         public void Remove()

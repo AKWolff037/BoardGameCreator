@@ -40,15 +40,7 @@ namespace BoardGameDesigner.UserControls
         }
         public void SetTemplate(IDesign context)
         {
-            var ofd = new Microsoft.Win32.OpenFileDialog();
-            ofd.FileName = "";
-            ofd.DefaultExt = ".png";
-            ofd.Filter = "Image Files (PNG, JPG, JPEG, GIF, BMP)|*.png;*.jpg;*.jpeg;*.gif;*.bmp";
-            ofd.InitialDirectory = System.IO.Path.GetFullPath(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ConfigurationManager.AppSettings["DefaultDirectory"]));
-            ofd.AddExtension = true;
-            ofd.CheckFileExists = true;
-            ofd.CheckPathExists = true;
-            ofd.DereferenceLinks = true;
+            var ofd = IO.ProjectIOManager.GetImageFileDialog();
             if (ofd.ShowDialog() == true)
             {
                 context.Template = new BitmapImage(new Uri(ofd.FileName));

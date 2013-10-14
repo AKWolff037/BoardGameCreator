@@ -7,6 +7,11 @@ using System.Windows.Media.Imaging;
 using BoardGameDesigner.IO;
 namespace BoardGameDesigner.Designs
 {
+    public enum LayerMoveType
+    {
+        UP,
+        DOWN
+    }
     public interface IDesign : IXmlElementConvertible, INameable, IToggleable, IRemovable
     {
         IDesignManager DesignManager { get; set; }
@@ -14,5 +19,6 @@ namespace BoardGameDesigner.Designs
         BitmapImage Template { get; set; }
         //void Draw();
         RenderTargetBitmap DrawImage();
+        void ReorderDesignElements(IDesignElement elementToMove, LayerMoveType direction);
     }
 }

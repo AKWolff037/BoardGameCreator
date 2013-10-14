@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using BoardGameDesigner.Designs;
 namespace BoardGameDesigner.Lib
 {
     public class MoveThumb : Thumb
@@ -33,7 +34,14 @@ namespace BoardGameDesigner.Lib
 
                 Canvas.SetLeft(designerItem, left + e.HorizontalChange);
                 Canvas.SetTop(designerItem, top + e.VerticalChange);
-            }
+
+                if (designerItem.DataContext is IDesignElement)
+                {
+                    (designerItem.DataContext as IDesignElement).X_Offset = left + e.HorizontalChange;
+                    (designerItem.DataContext as IDesignElement).Y_Offset = top + e.VerticalChange;
+                    (designerItem as DesignerContent).UpdateContent(this);
+                }
+            }            
         }
     }
 

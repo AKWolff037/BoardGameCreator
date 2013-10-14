@@ -7,7 +7,7 @@
              Height="648" Width="729" AllowDrop="True">
     <Grid x:Name="grdMain">
         <Canvas x:Name="cvsMain" Height="648" Width="729" VerticalAlignment="Top" HorizontalAlignment="Left" SnapsToDevicePixels="True" ClipToBounds="True" IsHitTestVisible="True">
-            <Image x:Name="imgTemplate" Height="648" Source="{Binding Template}">
+            <Image x:Name="imgTemplate" Stretch="None">
                 <Image.ContextMenu>
                     <ContextMenu>
                         <ContextMenu.Items>

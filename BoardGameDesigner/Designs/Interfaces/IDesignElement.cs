@@ -19,6 +19,8 @@ namespace BoardGameDesigner.Designs
         DataTable DataSource { get; set; }
         int Layer { get; set; }
         void Draw(DrawingContext context);
-        Rect Origin { get; set; }
+        double X_Offset { get; set; }
+        double Y_Offset { get; set; }
+        Size Size { get; set; }
     }
 }

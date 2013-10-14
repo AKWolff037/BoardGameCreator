@@ -14,41 +14,35 @@ namespace BoardGameDesigner.Designs
     public class ImageDesignElement : DesignElement, IImageDesignElement
     {
         public BitmapImage Image { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
         public ImageDesignElement(IDesign design)
             : base(design)
         {
             Image = null;
-            Width = 0.0f;
-            Height = 0.0f;
-            
+            Name = "New Image Design Element";
         }
         public ImageDesignElement(IDesign design, BitmapImage img)
             : base(design)
         {
             Image = img;
-            Width = img.Width;
-            Height = img.Height;
+            Name = "New Image Design Element";
+            Size = new Size(Image.Width, Image.Height);
         }
         public ImageDesignElement(IDesign design, BitmapImage img, double height, double width)
             : base(design)
         {
             Image = img;
-            Width = img.Width;
-            Height = img.Height;
+            Name = "New Image Design Element";
+            Size = new Size(width, height);
         }
 
         public override void Draw(DrawingContext context)
         {
-            context.DrawImage(Image, new Rect(Origin.X, Origin.Y, Height, Width));            
+            context.DrawImage(Image, new Rect(X_Offset, Y_Offset, Size.Width, Size.Height));            
         }
         public override XElement ToXmlElement()
         {
             var xElement = new XElement("ImageDesignElement",
-                new XElement("Image", Image.UriSource),
-                new XElement("Width", Width),
-                new XElement("Height", Height)
+                new XElement("Image", Image.UriSource)
                 );
             AddBasePropertiesToXmlElement(xElement);
             return xElement;
@@ -56,8 +50,6 @@ namespace BoardGameDesigner.Designs
         public override IXmlElementConvertible FromXmlElement(XElement element)
         {
             Image = new BitmapImage(new Uri(element.Element("Image").Value));
-            Width = double.Parse(element.Element("Width").Value);
-            Height = double.Parse(element.Element("Height").Value);
             LoadBasePropertiesFromXmlElement(element);
             return this;
         }

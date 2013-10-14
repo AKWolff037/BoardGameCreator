@@ -12,6 +12,20 @@ namespace BoardGameDesigner.IO
 {
     public static class ProjectIOManager
     {
+        public static Microsoft.Win32.OpenFileDialog GetImageFileDialog()
+        {
+            var ofd = new Microsoft.Win32.OpenFileDialog();
+            ofd.FileName = "";
+            ofd.DefaultExt = ".png";
+            ofd.Filter = "Image Files (PNG, JPG, JPEG, GIF, BMP)|*.png;*.jpg;*.jpeg;*.gif;*.bmp";
+            ofd.InitialDirectory = System.IO.Path.GetFullPath(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ConfigurationManager.AppSettings["DefaultDirectory"]));
+            ofd.AddExtension = true;
+            ofd.CheckFileExists = true;
+            ofd.CheckPathExists = true;
+            ofd.DereferenceLinks = true;
+            return ofd;
+        }
+
         public static Microsoft.Win32.SaveFileDialog GetSaveFileDialog()
         {
             var sfd = new Microsoft.Win32.SaveFileDialog();

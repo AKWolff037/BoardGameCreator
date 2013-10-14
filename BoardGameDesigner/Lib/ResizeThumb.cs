@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using BoardGameDesigner.Designs;
 namespace BoardGameDesigner.Lib
 {
     public class ResizeThumb : Thumb
@@ -58,6 +59,12 @@ namespace BoardGameDesigner.Lib
                         break;
                     default:
                         break;
+                }
+
+                if (designerItem.DataContext is IDesignElement)
+                {
+                    (designerItem.DataContext as IDesignElement).Size = new Size(designerItem.Width, designerItem.Height);
+                    (designerItem as DesignerContent).UpdateContent(this);
                 }
             }
 

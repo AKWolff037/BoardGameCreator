@@ -51,6 +51,33 @@ namespace BoardGameDesigner.Designs
             Template = null;
             this.DesignManager.Designs.Remove(this);            
         }
+        public void ReorderDesignElements(IDesignElement elementToMove, LayerMoveType direction)
+        {
+            var currentLayer = elementToMove.Layer;
+            var maxLayer = DesignElements.Max(elem => elem.Layer);
+            var minLayer = 1;
+            //Keep layers within bounds
+            if (elementToMove.Layer < minLayer)
+                elementToMove.Layer = minLayer;
+            if (elementToMove.Layer > maxLayer)
+                elementToMove.Layer = maxLayer;
+
+            if (elementToMove.Layer == maxLayer || elementToMove.Layer == minLayer)
+            {
+                //Already in the top or bottom position, nothing to do
+                return;
+            }
+            if (DesignElements.Count == 1)
+            {
+                //Only 1 element, nothing to do
+                return;
+            }
+            var elementToSwap = DesignElements.First(elem => elem.Layer < elementToMove.Layer && direction == LayerMoveType.UP
+                                                          || elem.Layer > elementToMove.Layer && direction == LayerMoveType.DOWN);
+            var current = elementToMove.Layer;
+            elementToMove.Layer = elementToSwap.Layer;
+            elementToSwap.Layer = current;
+        }
         public RenderTargetBitmap DrawImage()
         {
             var drawingVisual = new DrawingVisual();
@@ -65,7 +92,7 @@ namespace BoardGameDesigner.Designs
                 }
                 drawingContext.Close();
 
-                var render = new RenderTargetBitmap(Template.PixelWidth, Template.PixelHeight, 300, 300, PixelFormats.Default);
+                var render = new RenderTargetBitmap(Template.PixelWidth, Template.PixelHeight, Template.DpiX, Template.DpiY, PixelFormats.Default);
                 render.Render(drawingVisual);                
                 return render;
             }
@@ -79,6 +106,8 @@ namespace BoardGameDesigner.Designs
             element.Design = this;
             if (!DesignElements.Contains(element))
             {
+                while (DesignElements.Find(el => el.Layer == element.Layer) != null)
+                    element.Layer++;
                 DesignElements.Add(element);
             }
         }

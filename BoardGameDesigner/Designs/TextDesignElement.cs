@@ -22,17 +22,31 @@ namespace BoardGameDesigner.Designs
             : base(design)
         {
             Text = string.Empty;
-            FontSize = 0.0;
+            FontSize = 12.0;
             Weight = new FontWeight();
             Font = new System.Windows.Media.FontFamily("Times New Roman");
             Color = Brushes.Black;
             Style = FontStyles.Normal;
+            Name = "New Text Design Element";
         }
 
         public override void Draw(DrawingContext context)
         {
             var formattedText = new FormattedText(Text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface(Font, Style, Weight, new FontStretch()), FontSize, Color);
-            context.DrawText(formattedText, new Point(Origin.X, Origin.Y));
+            //Fit text to maximum size it can go depending on the size of the design element
+            while (formattedText.Height < Size.Height && formattedText.Width < Size.Width)
+            {
+                FontSize++;
+                formattedText = new FormattedText(Text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface(Font, Style, Weight, new FontStretch()), FontSize, Color);
+            }
+            while (formattedText.Height > Size.Height || formattedText.Width > Size.Width)
+            {
+                FontSize--;
+                if (FontSize < 1)
+                    break;
+                formattedText = new FormattedText(Text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface(Font, Style, Weight, new FontStretch()), FontSize, Color);
+            }
+            context.DrawText(formattedText, new Point(X_Offset, Y_Offset));
         }
         public override XElement ToXmlElement()
         {

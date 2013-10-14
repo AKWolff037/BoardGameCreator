@@ -124,7 +124,7 @@ namespace BoardGameDesigner
                 var designItem = CreateTreeViewItem(design.Name, design, true, dict);
                 var templateItem = CreateTreeViewItem("Template", design, false);
                 designItem.Items.Add(templateItem);
-                foreach (IDesignElement designElem in design.DesignElements)
+                foreach (IDesignElement designElem in design.DesignElements.OrderBy(elem => elem.Layer))
                 {
                     var elementItem = CreateTreeViewItem(designElem.Name, designElem, true, dict);
                     var condItem = CreateTreeViewItem("Condition", designElem.Condition, false);
@@ -253,21 +253,13 @@ namespace BoardGameDesigner
             var isCondition = dataContext is ICondition;
             var isImage = dataContext is BitmapImage;
 
-            if (selectedItem is INameable || isDataColumn || isDataTable)
-            {
-                AddRenameItem(contextMenu);
-            }
-            if (selectedItem is IToggleable)
-            {
-                AddEnableDisableItem(contextMenu, (selectedItem as IToggleable).Enabled);
-            }
             if (isDesignManager)
             {
                 AddNewDesignItem(contextMenu);
             }
             if (isDesign)
             {
-                AddPreviewItem(contextMenu);
+                AddOpenItem(contextMenu);
                 AddSetTemplateItem(contextMenu);
                 AddNewImageElementItem(contextMenu);
                 AddNewTextElementItem(contextMenu);
@@ -277,6 +269,8 @@ namespace BoardGameDesigner
             {
                 AddOpenItem(contextMenu);
                 AddDeleteItem(contextMenu);
+                AddMoveItemUp(contextMenu);
+                AddMoveItemDown(contextMenu);
             }
             if (isDataset)
             {
@@ -290,12 +284,32 @@ namespace BoardGameDesigner
             {
                 AddOpenItem(contextMenu);                
             }
-
+            if (dataContext is INameable || isDataColumn || isDataTable)
+            {
+                AddRenameItem(contextMenu);
+            }
+            if (dataContext is IToggleable)
+            {
+                AddEnableDisableItem(contextMenu, (dataContext as IToggleable).Enabled);
+            }
             AddRefreshItem(contextMenu);
         }
         #endregion
 
         #region Menu Item Command Creation
+        private void AddMoveItemUp(ContextMenu menu)
+        {
+            var moveItem = new MenuItem() { Header = "Move Element Up" };
+            moveItem.Click += tvElementView_MoveItemUp;
+            menu.Items.Add(moveItem);
+        }
+        private void AddMoveItemDown(ContextMenu menu)
+        {
+            var moveItem = new MenuItem() { Header = "Move Element Down" };
+            moveItem.Click += tvElementView_MoveItemDown;
+            menu.Items.Add(moveItem);
+        }
+
         private void AddEnableDisableItem(ContextMenu menu, bool currentState)
         {
             var enableItem = new MenuItem() { Header = currentState ? "Disable" : "Enable" };
@@ -303,12 +317,6 @@ namespace BoardGameDesigner
             menu.Items.Add(enableItem);
             menu.Items.Add(new Separator());
 
-        }
-        private void AddPreviewItem(ContextMenu menu)
-        {
-            var prevItem = new MenuItem() { Header = "Preview" };
-            prevItem.Click += tvElementView_PreviewItem;
-            menu.Items.Add(prevItem);
         }
 
         private void AddOpenItem(ContextMenu menu)
@@ -338,9 +346,10 @@ namespace BoardGameDesigner
         private void AddNewImageElementItem(ContextMenu menu)
         {
             var addNewImageElement = new MenuItem() { Header = "Add New Image Element" };
-            addNewImageElement.Click += tvElementView_AddNewTextDesignElement;
+            addNewImageElement.Click += tvElementView_AddNewImageDesignElement;
             menu.Items.Add(addNewImageElement);
         }
+
         private void AddSetTemplateItem(ContextMenu menu)
         {
             var setTemplate = new MenuItem() { Header = "Set Template" };
@@ -349,10 +358,6 @@ namespace BoardGameDesigner
         }
         private void AddRenameItem(ContextMenu menu)
         {
-            if (menu.Items.Count > 0)
-            {
-                menu.Items.Add(new Separator());
-            }
             var renameItem = new MenuItem() { Header = "Rename" };
             renameItem.Click += tvElementView_RenameItem;
             menu.Items.Add(renameItem);            
@@ -376,13 +381,7 @@ namespace BoardGameDesigner
         }
 
         #region Context Menu Event Handlers
-        private void tvElementView_PreviewItem(object sender, RoutedEventArgs e)
-        {
-            var selectedItem = (tvElementView.SelectedItem as FrameworkElement).DataContext;
-            if (selectedItem == null)
-                return;
-            OpenItemPreview(selectedItem);
-        }
+
         private void tvElementView_ToggleItem(object sender, RoutedEventArgs e)
         {
             var selectedItem = (tvElementView.SelectedItem as FrameworkElement).DataContext;
@@ -453,7 +452,32 @@ namespace BoardGameDesigner
                 }
             }
         }
-
+        private void tvElementView_MoveItemUp(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = (tvElementView.SelectedItem as FrameworkElement).DataContext;
+            if (selectedItem == null)
+                return;
+            if (selectedItem is IDesignElement)
+            {
+                var designElem = selectedItem as IDesignElement;
+                var design = designElem.Design;
+                design.ReorderDesignElements(designElem, LayerMoveType.UP);
+                RefreshTreeView();
+            }
+        }
+        private void tvElementView_MoveItemDown(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = (tvElementView.SelectedItem as FrameworkElement).DataContext;
+            if (selectedItem == null)
+                return;
+            if (selectedItem is IDesignElement)
+            {
+                var designElem = selectedItem as IDesignElement;
+                var design = designElem.Design;
+                design.ReorderDesignElements(designElem, LayerMoveType.DOWN);
+                RefreshTreeView();
+            }
+        }
         private void tvElementView_DeleteItem(object sender, RoutedEventArgs e)
         {
             var selectedItem = (tvElementView.SelectedItem as FrameworkElement).DataContext;
@@ -485,12 +509,41 @@ namespace BoardGameDesigner
 
         private void tvElementView_AddNewTextDesignElement(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Added New Text Design Element");
+            var selectedItem = (tvElementView.SelectedItem as FrameworkElement).DataContext;
+            if (selectedItem is IDesign)
+            {
+                var textElem = new TextDesignElement(selectedItem as IDesign);
+                (selectedItem as IDesign).DesignElements.Add(textElem);
+                (selectedItem as IDesign).DesignManager.Project.IsDirty = true;
+            }
+            RefreshTreeView();
         }
-
+        private void tvElementView_AddNewImageDesignElement(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = (tvElementView.SelectedItem as FrameworkElement).DataContext;
+            if (selectedItem is IDesign)
+            {
+                var ofd = IO.ProjectIOManager.GetImageFileDialog();
+                if (ofd.ShowDialog() == true)
+                {
+                    var sourceImg = new BitmapImage(new Uri(ofd.FileName));
+                    var imgElem = new ImageDesignElement(selectedItem as IDesign, sourceImg);
+                    (selectedItem as IDesign).DesignElements.Add(imgElem);
+                    (selectedItem as IDesign).DesignManager.Project.IsDirty = true;
+                }
+            }
+            RefreshTreeView();
+        }
         private void tvElementView_AddNewDesign(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Added New Design");
+            var selectedItem = (tvElementView.SelectedItem as FrameworkElement).DataContext;
+            if (selectedItem is IDesignManager)
+            {
+                var newDesign = new Design(selectedItem as IDesignManager);
+                (selectedItem as IDesignManager).Designs.Add(newDesign);
+                (selectedItem as IDesignManager).Project.IsDirty = true;
+            }
+            RefreshTreeView();        
         }
 
         private void tvElementView_OpenItem(object sender, RoutedEventArgs e)
@@ -582,7 +635,7 @@ namespace BoardGameDesigner
             }
             else if (item is IImageDesignElement)
             {
-                ucContent = new UserControls.ucImageDesignElementEditor(item);
+                ucContent = new UserControls.ucImageDesignElementEditor(item as IImageDesignElement);
             }
             else if (item is IDesign)
             {
@@ -590,7 +643,7 @@ namespace BoardGameDesigner
             }
             else if (item is DataSet)
             {
-                ucContent = new UserControls.ucDataSetEditor(item);
+                ucContent = new UserControls.ucDataSetEditor(item as DataSet);
             }
             else if (item is ICondition)
             {
@@ -724,7 +777,7 @@ namespace BoardGameDesigner
             var imgDesign = new ImageDesignElement(newDesign, img, 500.0, 250.0);
             var textDesign = new TextDesignElement(newDesign);
             textDesign.Name = "Fireballs";
-            textDesign.Layer = 2;
+            textDesign.Layer = 1;
             textDesign.Condition = new SimpleCondition(textDesign, testds.Tables[0].Columns[0], Designs.Condition.ConditionalOperator.Equals, "Test");
             textDesign.DataSource = testTable1;
             textDesign.ValueSource = testTable1.Columns[1];
@@ -745,8 +798,7 @@ namespace BoardGameDesigner
                                                                    )
                                                    );
             imgDesign.DataSource = testTable2;
-            imgDesign.Layer = 1;
-            //imgDesign.Origin = new PointF(0f, 0f);            
+            imgDesign.Layer = 2;
 
             newDesign.DesignElements.Add(textDesign);
             newDesign.DesignElements.Add(imgDesign);

@@ -37,50 +37,41 @@ namespace BoardGameDesigner.UserControls
 
         private void LoadDesignElements()
         {
-            foreach (IDesignElement elem in Design.DesignElements)
+            foreach (IDesignElement elem in Design.DesignElements.OrderBy(el => el.Layer))
             {
-                var contentCtrl = new ContentControl();
+                var contentCtrl = new BoardGameDesigner.Lib.DesignerContent();
                 contentCtrl.BeginInit();
-                var style = Application.Current.FindResource("DesignerControlStyle") as Style;                                         
-                if (elem is ITextDesignElement)
-                {
-                    var textElem = (elem as ITextDesignElement);
-                    contentCtrl.Content = textElem.Text;
-                    contentCtrl.FontSize = textElem.FontSize;
-                    contentCtrl.FontFamily = textElem.Font;
-                    contentCtrl.FontStyle = textElem.Style;
-                    contentCtrl.Foreground = textElem.Color;
-                }
-                else if (elem is IImageDesignElement)
-                {
-                    contentCtrl.Content = (elem as IImageDesignElement).Image;
-                    this.Height = (elem as IImageDesignElement).Image.Height;
-                    this.Width = (elem as IImageDesignElement).Image.Width;
-                }
+                var style = Application.Current.FindResource("DesignerControlStyle") as Style;
+                contentCtrl.DataContext = elem;                         
                 contentCtrl.Style = style;
                 var dataTemplate = contentCtrl.ContentTemplate;
-                Canvas.SetLeft(contentCtrl, elem.Origin.X);
-                Canvas.SetTop(contentCtrl, elem.Origin.Y);
-                contentCtrl.Height = 30;
-                contentCtrl.Width = 70;
-                //contentCtrl.Height = Math.Max(elem.Origin.Height, contentCtrl.ActualHeight);
-                //contentCtrl.Width = Math.Max(elem.Origin.Width, contentCtrl.ActualWidth);
+                contentCtrl.Height = elem.Size.Height;
+                contentCtrl.Width = elem.Size.Width;
+                contentCtrl.ContentUpdated += contentCtrl_ContentUpdated;
+                Canvas.SetLeft(contentCtrl, elem.X_Offset);
+                Canvas.SetTop(contentCtrl, elem.Y_Offset);
                 cvsMain.Children.Add(contentCtrl);
+                CreateAndDrawImage();
             }
+        }
+
+        void contentCtrl_ContentUpdated(object sender, RoutedEventArgs e)
+        {
+            CreateAndDrawImage();
+        }
+
+        private void CreateAndDrawImage()
+        {
+            var img = (this.DataContext as IDesign).DrawImage();
+            imgTemplate.Source = img;
+            imgTemplate.Height = img.Height;
+            imgTemplate.Width = img.Width;
         }
 
         private void mnuAddNewImageElement_Click(object sender, RoutedEventArgs e)
         {
-            var ofd = new Microsoft.Win32.OpenFileDialog();
-            ofd.FileName = "";
-            ofd.DefaultExt = ".png";
-            ofd.Filter = "Image Files (PNG, JPG, JPEG, GIF, BMP)|*.png;*.jpg;*.jpeg;*.gif;*.bmp";
-            ofd.InitialDirectory = System.IO.Path.GetFullPath(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ConfigurationManager.AppSettings["DefaultDirectory"]));
-            ofd.AddExtension = true;
-            ofd.CheckFileExists = true;
-            ofd.CheckPathExists = true;
-            ofd.DereferenceLinks = true;
-            if (ofd.ShowDialog() == true)
+            var ofd = IO.ProjectIOManager.GetImageFileDialog();
+            if(ofd.ShowDialog() == true)
             {
                 var img = new BitmapImage(new Uri(ofd.FileName));
                 Design.DesignManager.Project.IsDirty = true;
@@ -97,15 +88,7 @@ namespace BoardGameDesigner.UserControls
 
         private void mnuSetTemplate_Click(object sender, RoutedEventArgs e)
         {
-            var ofd = new Microsoft.Win32.OpenFileDialog();
-            ofd.FileName = "";
-            ofd.DefaultExt = ".png";
-            ofd.Filter = "Image Files (PNG, JPG, JPEG, GIF, BMP)|*.png;*.jpg;*.jpeg;*.gif;*.bmp";
-            ofd.InitialDirectory = System.IO.Path.GetFullPath(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ConfigurationManager.AppSettings["DefaultDirectory"]));
-            ofd.AddExtension = true;
-            ofd.CheckFileExists = true;
-            ofd.CheckPathExists = true;
-            ofd.DereferenceLinks = true;
+            var ofd = IO.ProjectIOManager.GetImageFileDialog();
             if (ofd.ShowDialog() == true)
             {
                 Design.Template = new BitmapImage(new Uri(ofd.FileName));

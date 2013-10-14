@@ -9,7 +9,5 @@ namespace BoardGameDesigner.Designs
     interface IImageDesignElement : IDesignElement
     {
         BitmapImage Image { get; set; }
-        double Width { get; set; }
-        double Height { get; set; }
     }
 }

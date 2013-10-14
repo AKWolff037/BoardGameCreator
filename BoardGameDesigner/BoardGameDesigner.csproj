@@ -68,14 +68,10 @@
     </ApplicationDefinition>
     <Compile Include="Designs\Interfaces\IRemovable.cs" />
     <Compile Include="Designs\Interfaces\IToggleable.cs" />
-    <Compile Include="Lib\ThumbEvents.cs" />
-    <Compile Include="Styles\DesignElementStyle.cs" />
+    <Compile Include="Lib\DesignerContent.cs" />
     <Compile Include="Lib\MoveThumb.cs" />
     <Compile Include="Lib\ResizeThumb.cs" />
     <Compile Include="Lib\SizeAdorner.cs" />
-    <Compile Include="Styles\MoveThumbStyle.cs" />
-    <Compile Include="Styles\ResizeControlStyle.cs" />
-    <Compile Include="Styles\ThumbEllipseStyle.cs" />
     <Compile Include="UserControls\ucBindToDataSet.xaml.cs">
       <DependentUpon>ucBindToDataSet.xaml</DependentUpon>
     </Compile>
