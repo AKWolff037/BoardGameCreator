@@ -29,10 +29,11 @@ namespace BoardGameDesigner.IO
         public static Microsoft.Win32.SaveFileDialog GetSaveFileDialog()
         {
             var sfd = new Microsoft.Win32.SaveFileDialog();
-            sfd.FileName = "New Project";
+            sfd.Reset();
+            sfd.FileName = "New Project.bgProj";
             sfd.DefaultExt = ".bgProj";
             sfd.Filter = "Board Game Designer Projects (.bgProj)|*.bgProj";
-            sfd.InitialDirectory = ConfigurationManager.AppSettings["DefaultDirectory"];
+            sfd.InitialDirectory = System.IO.Path.GetFullPath(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ConfigurationManager.AppSettings["DefaultDirectory"]));
             sfd.AddExtension = true;
             sfd.CheckFileExists = false;
             sfd.CheckPathExists = true;
@@ -58,8 +59,10 @@ namespace BoardGameDesigner.IO
             var project = LoadProjectFromXmlDocument(xDoc);
             return project;
         }
-        public static void SaveProject(IProject project, string filePath)
+        public static void SaveProject(IProject project, string filePath = null)
         {
+            if (filePath == null)
+                filePath = project.ProjectFilePath;
             var fileInfo = new System.IO.FileInfo(filePath);
             if (!fileInfo.Directory.Exists)
             {

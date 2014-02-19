@@ -12,6 +12,9 @@ namespace BoardGameDesigner.Designs
         UP,
         DOWN
     }
+    /// <summary>
+    /// Represents a Design, which contains a collection of Design Elements
+    /// </summary>
     public interface IDesign : IXmlElementConvertible, INameable, IToggleable, IRemovable
     {
         IDesignManager DesignManager { get; set; }

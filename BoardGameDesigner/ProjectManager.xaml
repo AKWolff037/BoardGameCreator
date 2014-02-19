@@ -19,10 +19,9 @@
         <Menu x:Name="mnuMain" IsMainMenu="True" Height="20" VerticalAlignment="Top" Grid.ColumnSpan="2">
             <MenuItem Header="_File">
                 <MenuItem Header="_New Project" Click="mnuMain_CreateNewProject" />
-                <MenuItem Header="_Save Project" Click="mnuMain_SaveProject" />
+                <MenuItem Header="_Save Project" Click="mnuMain_SaveProject" IsEnabled="{Binding ProjectLoaded, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
                 <MenuItem Header="_Load Project" Click="mnuMain_LoadProject" />
-                <MenuItem Header="_Close Project" Click="mnuMain_CloseProject" />
-                <MenuItem Header="_Load Sample Data" Click="mnuMain_CreateSampleProject" />
+                <MenuItem Header="_Close Project" Click="mnuMain_CloseProject" IsEnabled="{Binding ProjectLoaded, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
                 <Separator />
                 <MenuItem Header="_Refresh View" Command="Refresh" InputGestureText="F5" />
                 <Separator />

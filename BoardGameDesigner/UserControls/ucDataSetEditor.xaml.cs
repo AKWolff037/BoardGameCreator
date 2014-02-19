@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data;
+using BoardGameDesigner.Projects;
 namespace BoardGameDesigner.UserControls
 {
     /// <summary>
@@ -20,9 +21,11 @@ namespace BoardGameDesigner.UserControls
     /// </summary>
     public partial class ucDataSetEditor : UserControl
     {
-        public ucDataSetEditor(object context)
+        private IProject _project = null;
+        public ucDataSetEditor(object context, IProject proj)
         {
             InitializeComponent();
+            _project = proj;
             dgMain.DataContext = context;
             LoadTableComboBox(context as DataSet);
         }
@@ -80,6 +83,8 @@ namespace BoardGameDesigner.UserControls
                 if (renameWindow.ShowDialog() == true)
                 {
                     (dgMain.DataContext as DataSet).Tables.Add(newTable);
+                    dgMain.ItemsSource = newTable.DefaultView;
+                    cboTables.SelectedItem = newTable;
                 }
             }
             else if (cboTables.SelectedItem != null && cboTables.SelectedItem is DataTable)
@@ -87,9 +92,25 @@ namespace BoardGameDesigner.UserControls
                 dgMain.ItemsSource = (cboTables.SelectedItem as DataTable).DefaultView;                
             }
         }
-
+        private void InsertNewRow()
+        {
+            if (dgMain.SelectedCells.Count == 1)
+            {
+                if (dgMain.SelectedCells[0].Column == dgMain.Columns.Last())
+                {
+                    var dgSource = (dgMain.DataContext as DataTable);
+                    if (dgSource != null)
+                    {
+                        var newRow = dgSource.NewRow();
+                        newRow.BeginEdit();
+                    }
+                }
+            }
+        }
         private void btnClose_Click(object sender, RoutedEventArgs e)
-        {            
+        {
+            if (_project != null)
+                _project.Save();
             if (this.Parent is ContentControl)
             {
                 (this.Parent as ContentControl).Content = null;

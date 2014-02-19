@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace BoardGameDesigner.Designs
 {
+    /// <summary>
+    /// IToggleable classes implement a boolean to determine if they are enabled or not
+    /// </summary>
     public interface IToggleable
     {
         bool Enabled { get; set; }

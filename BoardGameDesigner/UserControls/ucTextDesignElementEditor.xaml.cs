@@ -74,8 +74,8 @@ namespace BoardGameDesigner.UserControls
         }
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
-        {
-            _element.Design.DesignManager.Project.IsDirty = true;
+        {            
+            _element.Design.DesignManager.Project.Save();
             if (this.Parent is ContentControl)
             {
                 (this.Parent as ContentControl).Content = null;
@@ -85,6 +85,8 @@ namespace BoardGameDesigner.UserControls
         private void chkUseDataBinding_Checked(object sender, RoutedEventArgs e)
         {
             txtDisplayText.IsEnabled = false;
+            txtDisplayText.Text = "";
+            _element.Text = "";
             ccDataSetBinding.IsEnabled = true;
         }
 

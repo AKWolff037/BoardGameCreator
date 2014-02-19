@@ -25,19 +25,23 @@ namespace BoardGameDesigner
         #region Variables
         private UserControl _activeControl;
         private IProject CurrentProject;
-        string ProjectFilePath;
+        public DependencyProperty ProjectLoaded = DependencyProperty.Register("ProjectLoaded", typeof(bool), typeof(Window));
+        
         #endregion
 
         #region Constructors
         public ProjectManager(IProject proj, string projFilePath)
         {
             CurrentProject = proj;
-            ProjectFilePath = projFilePath;
+            proj.ProjectFilePath = projFilePath;
             InitializeComponent();
+            if (proj != null)
+                SetCurrentValue(ProjectLoaded, true);
         }
         public ProjectManager()
         {
             InitializeComponent();
+            SetCurrentValue(ProjectLoaded, false);
         }
         #endregion
 
@@ -90,7 +94,28 @@ namespace BoardGameDesigner
                 treeViewItem.IsExpanded = LookupExpandedFlag(dict, name);
             }
             treeViewItem.MouseMove += TreeViewItem_MouseMove;
+            treeViewItem.MouseDoubleClick += treeViewItem_MouseDoubleClick;
             return treeViewItem;
+        }
+
+        void treeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var selectedItem = tvElementView.SelectedItem;
+            if (selectedItem != null)
+            {
+                var dataContext = (selectedItem as FrameworkElement).DataContext;
+                var isDesignElement = dataContext is IDesignElement;
+                var isDesign = dataContext is IDesign;
+                var isDataset = dataContext is DataSet;
+                var isDataTable = dataContext is DataTable;
+                var isCondition = dataContext is ICondition;
+                var isImage = dataContext is BitmapImage;
+
+                if (isDesignElement || isDesign || isDataset || isDataTable || isImage || isCondition)
+                {
+                    OpenItem(dataContext);
+                }
+            }
         }
 
         private void TreeViewItem_MouseMove(object sender, MouseEventArgs e)
@@ -169,7 +194,7 @@ namespace BoardGameDesigner
         #region Menu Events
         private void mnuMain_SaveProject(object sender, RoutedEventArgs e)
         {
-            IO.ProjectIOManager.SaveProject(CurrentProject, ProjectFilePath);            
+            IO.ProjectIOManager.SaveProject(CurrentProject);            
         }
 
         private void mnuMain_LoadProject(object sender, RoutedEventArgs e)
@@ -180,9 +205,16 @@ namespace BoardGameDesigner
             {
                 var project = IO.ProjectIOManager.LoadProject(ofd.FileName);
                 CurrentProject = project;
-                ProjectFilePath = ofd.FileName;
+                project.ProjectFilePath = ofd.FileName;
+                project.Saved += project_Saved;
                 RefreshTreeView();
+                SetCurrentValue(ProjectLoaded, true);
             }
+        }
+
+        void project_Saved(object sender, RoutedEventArgs e)
+        {
+            RefreshTreeView();
         }
 
         private void mnuMain_ExitApplication(object sender, RoutedEventArgs e)
@@ -201,7 +233,7 @@ namespace BoardGameDesigner
                 var dialogResult = MessageBox.Show("Would you like to save your current project?", "Save Before Closing?", MessageBoxButton.YesNoCancel);
                 if (dialogResult == MessageBoxResult.Yes)
                 {
-                    IO.ProjectIOManager.SaveProject(CurrentProject, ProjectFilePath);
+                   CurrentProject.Save();
                 }
                 
             }
@@ -209,18 +241,20 @@ namespace BoardGameDesigner
             RefreshTreeView();
             tvElementView.Visibility = System.Windows.Visibility.Hidden;
             ccUserControl.Content = null;
+            SetCurrentValue(ProjectLoaded, false);
         }
 
         private void mnuMain_CreateNewProject(object sender, RoutedEventArgs e)
         {
-            var sfd = IO.ProjectIOManager.GetSaveFileDialog();
-            if (sfd.ShowDialog() == true)
+            var sfd = IO.ProjectIOManager.GetSaveFileDialog();            
+            if (sfd.ShowDialog(this) == true)
             {
                 var newProject = new Projects.GameProject(sfd.SafeFileName.Replace(".bgProj", ""));
                 IO.ProjectIOManager.SaveProject(newProject, sfd.FileName);
                 CurrentProject = newProject;
-                ProjectFilePath = sfd.FileName;
+                CurrentProject.ProjectFilePath = sfd.FileName;
                 RefreshTreeView();
+                SetCurrentValue(ProjectLoaded, true);
             }
         }
         #endregion
@@ -276,7 +310,12 @@ namespace BoardGameDesigner
             {
                 AddOpenItem(contextMenu);
             }
-            if (isDataTable || isDataColumn)
+            if (isDataTable)
+            {
+                AddOpenItem(contextMenu);
+                AddDeleteItem(contextMenu);
+            }
+            if (isDataColumn)
             {
                 AddDeleteItem(contextMenu);
             }
@@ -568,7 +607,7 @@ namespace BoardGameDesigner
                     var dialogResult = MessageBox.Show("Would you like to save your current project?", "Save Before Closing?", MessageBoxButton.YesNoCancel);
                     if (dialogResult == MessageBoxResult.Yes)
                     {
-                        IO.ProjectIOManager.SaveProject(CurrentProject, ProjectFilePath);
+                        IO.ProjectIOManager.SaveProject(CurrentProject);
                     }
                     else if (dialogResult == MessageBoxResult.No)
                     {
@@ -643,11 +682,16 @@ namespace BoardGameDesigner
             }
             else if (item is DataSet)
             {
-                ucContent = new UserControls.ucDataSetEditor(item as DataSet);
+                ucContent = new UserControls.ucDataSetEditor(item as DataSet, CurrentProject);
             }
             else if (item is ICondition)
             {
                 ucContent = new UserControls.ucConditionEditor(item as ICondition);
+            }
+            else if (item is DataTable)
+            {
+                ucContent = new UserControls.ucDataSetEditor((item as DataTable).DataSet, CurrentProject);
+                (ucContent as UserControls.ucDataSetEditor).cboTables.SelectedItem = (item as DataTable);
             }
             if (ucContent != null)
             {

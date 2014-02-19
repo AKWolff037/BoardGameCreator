@@ -72,7 +72,7 @@ namespace BoardGameDesigner.Designs
                 //Only 1 element, nothing to do
                 return;
             }
-            var elementToSwap = DesignElements.First(elem => elem.Layer < elementToMove.Layer && direction == LayerMoveType.UP
+            var elementToSwap = DesignElements.OrderBy(elem => elem.Layer).First(elem => elem.Layer < elementToMove.Layer && direction == LayerMoveType.UP
                                                           || elem.Layer > elementToMove.Layer && direction == LayerMoveType.DOWN);
             var current = elementToMove.Layer;
             elementToMove.Layer = elementToSwap.Layer;
@@ -129,7 +129,30 @@ namespace BoardGameDesigner.Designs
         public IXmlElementConvertible FromXmlElement(XElement element)
         {
             Name = element.Element("Name").Value;
-            Template = new BitmapImage(new Uri(element.Element("Template").Value));
+            var sourceUri = new Uri(element.Element("Template").Value);
+            var sourceFile = new System.IO.FileInfo(sourceUri.LocalPath);
+            var sourceFilePath = "";
+            if (!sourceFile.Exists)
+            {
+                MessageBox.Show("File: " + sourceFile + " was not found.  Please select another image.");
+                var ofd = ProjectIOManager.GetImageFileDialog();
+                if (ofd.ShowDialog() == true)
+                {
+                    sourceFilePath = ofd.FileName;
+                    var imageUri = new Uri(sourceFilePath);
+                    Template = new BitmapImage(imageUri);
+                }
+                else
+                {
+                    Template = new BitmapImage();
+                }
+            }
+            else
+            {
+                sourceFilePath = sourceFile.FullName;
+                var imageUri = new Uri(sourceFilePath);
+                Template = new BitmapImage(imageUri);
+            }            
             Enabled = bool.Parse(element.Element("Enabled").Value);
             foreach (XElement designElem in element.Element("DesignElements").Elements("TextDesignElement"))
             {

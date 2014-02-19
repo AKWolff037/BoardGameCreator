@@ -11,6 +11,9 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 namespace BoardGameDesigner.Designs
 {
+    /// <summary>
+    /// Represents a Design Element, which is each individual element in a design
+    /// </summary>
     public interface IDesignElement : IXmlElementConvertible, INameable, IToggleable, IRemovable
     {
         IDesign Design { get; set; }

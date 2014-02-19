@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using BoardGameDesigner.IO;
 using BoardGameDesigner.Designs;
+using System.Windows;
 namespace BoardGameDesigner.Projects
 {
     public class GameProject : IProject
@@ -13,6 +14,17 @@ namespace BoardGameDesigner.Projects
         public virtual string Name { get; set; }
         public virtual IDesignManager DesignManager { get; set;}
         public bool IsDirty { get; set; }
+        public virtual string ProjectFilePath { get; set; } 
+        public virtual event RoutedEventHandler Saved;
+        public virtual void Save()
+        {
+            IO.ProjectIOManager.SaveProject(this);
+            if (Saved != null)
+            {
+                var args = new RoutedEventArgs(null);
+                Saved(this, args);
+            }
+        }
         public GameProject()
         {
             Name = "New Project";

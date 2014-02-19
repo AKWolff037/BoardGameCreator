@@ -9,10 +9,13 @@ using BoardGameDesigner.IO;
 using BoardGameDesigner.Projects;
 namespace BoardGameDesigner.Designs
 {
+    /// <summary>
+    /// Represents a Design Manager, which contains a collection of Designs as well as a DataSet
+    /// </summary>
     public interface IDesignManager : IXmlElementConvertible
     {
         IProject Project { get; set; }
         List<IDesign> Designs { get; }
-        DataSet Dataset { get; set; }
+        DataSet Dataset { get; set; }        
     }
 }

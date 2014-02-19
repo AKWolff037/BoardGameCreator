@@ -7,6 +7,9 @@ using BoardGameDesigner.IO;
 using System.Data;
 namespace BoardGameDesigner.Designs
 {
+    /// <summary>
+    /// An abstract condition class that can be inherited from.  Does not directly implement the Evaluate function.
+    /// </summary>
     public abstract class Condition : ICondition
     {
         public IDesignElement OwnerElement { get; private set; }
@@ -32,6 +35,16 @@ namespace BoardGameDesigner.Designs
         public abstract bool Evaluate(DataRow drow);
         public abstract XElement ToXmlElement();
         public abstract IXmlElementConvertible FromXmlElement(XElement element);
+        /// <summary>
+        /// Compares values based on the input and returns if they are equal
+        /// </summary>
+        /// <param name="col">The DataColumn to grab the data out of the DataRow from</param>
+        /// <param name="b">The object value to compare to</param>
+        /// <param name="op">The operation used in the comparison</param>
+        /// <param name="type">The type of comparision to do (Text, Numeric)</param>
+        /// <param name="drow">The DataRow to use </param>
+        /// <returns>Returns an evaluation of whether the data is equal based on the input.</returns>
+        /// <remarks>Text comparisons can only use an Operator of Equals or NotEquals, or will always return false</remarks>
         public bool CompareValues(DataColumn col, object b, ConditionalOperator op, ComparisonType type, DataRow drow)
         {
             var Astring = drow[col].ToString();
@@ -45,13 +58,18 @@ namespace BoardGameDesigner.Designs
                     case ConditionalOperator.NotEquals:
                         return Astring != Bstring;
                     default:
-                        throw new InvalidOperationException("Cannot do a text comparision with operator of " + op);
+                        return false;
                 }
             }
             else if (type == ComparisonType.NumericValue)
             {
-                var aNum = double.Parse(Astring);
-                var bNum = double.Parse(Bstring);
+                double aNum, bNum;
+                var isANum = double.TryParse(Astring, out aNum);
+                var isBNum = double.TryParse(Bstring, out bNum);
+                if (isANum == false || isBNum == false)
+                {
+                    return false;
+                }
                 switch (op)
                 {
                     case ConditionalOperator.Equals:
@@ -67,14 +85,21 @@ namespace BoardGameDesigner.Designs
                     case ConditionalOperator.NotEquals:
                         return aNum != bNum;
                     default:
-                        throw new InvalidOperationException("Cannot do a numeric comparision with operator of " + op);
+                        return false;
                 }
             }
             else
             {
-                throw new InvalidOperationException("Cannot do a comparison without a comparison type and operator.");
+                return false;
             }
         }
+        /// <summary>
+        /// Parses an XElement and returns a condition typecasted to the condition specified in the Xml
+        /// </summary>
+        /// <param name="owner">The element that owns the condition</param>
+        /// <param name="element">The XElement to parse</param>
+        /// <param name="isConditionElement">Boolean flag to determine whether the element is the Condition element, or is the parent.  True if parsing the condition element itself, false if parsing its parent</param>
+        /// <returns>Returns the parsed XElement as an ICondition</returns>
         public static ICondition ParseElement(IDesignElement owner, XElement element, bool isConditionElement = false)
         {
             if (!isConditionElement)

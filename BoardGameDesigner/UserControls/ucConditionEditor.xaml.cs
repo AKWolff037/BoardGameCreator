@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Data;
 using BoardGameDesigner.Designs;
 namespace BoardGameDesigner.UserControls
 {
@@ -20,11 +21,12 @@ namespace BoardGameDesigner.UserControls
     /// </summary>
     public partial class ucConditionEditor : UserControl
     {
-        public ICondition Condition;
+        public ICondition Condition;        
         public ucConditionEditor(ICondition cond)
         {
             InitializeComponent();
             Condition = cond;
+            this.DataContext = cond;
         }
         public ucConditionEditor()
         {

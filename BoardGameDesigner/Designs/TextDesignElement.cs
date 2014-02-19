@@ -32,14 +32,18 @@ namespace BoardGameDesigner.Designs
 
         public override void Draw(DrawingContext context)
         {
+            if (Text == "" && ValueSource != null && DataSource != null && DataSource.Rows.Count > 0)
+            {
+                Text = (DataSource.Rows[0][ValueSource].ToString());
+            }
             var formattedText = new FormattedText(Text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface(Font, Style, Weight, new FontStretch()), FontSize, Color);
             //Fit text to maximum size it can go depending on the size of the design element
-            while (formattedText.Height < Size.Height && formattedText.Width < Size.Width)
+            while (formattedText.Height < Size.Height && formattedText.Width < Size.Width && FontSize <= 200.00)
             {
                 FontSize++;
                 formattedText = new FormattedText(Text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface(Font, Style, Weight, new FontStretch()), FontSize, Color);
             }
-            while (formattedText.Height > Size.Height || formattedText.Width > Size.Width)
+            while (formattedText.Height > Size.Height || formattedText.Width > Size.Width && FontSize >= 2)
             {
                 FontSize--;
                 if (FontSize < 1)

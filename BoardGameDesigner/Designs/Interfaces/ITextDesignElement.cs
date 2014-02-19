@@ -7,6 +7,9 @@ using System.Windows;
 using System.Windows.Media;
 namespace BoardGameDesigner.Designs
 {
+    /// <summary>
+    /// Represents a Text-based Design Element
+    /// </summary>
     public interface ITextDesignElement : IDesignElement
     {
         string Text { get; set; }

@@ -10,6 +10,9 @@ namespace BoardGameDesigner.Projects
     public interface IProject : IXmlElementConvertible, INameable
     {
         IDesignManager DesignManager { get; set; }
+        string ProjectFilePath { get; set; }
         bool IsDirty { get; set; }
+        void Save();
+        event System.Windows.RoutedEventHandler Saved;
     }
 }

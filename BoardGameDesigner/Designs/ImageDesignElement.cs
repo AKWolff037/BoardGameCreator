@@ -49,7 +49,30 @@ namespace BoardGameDesigner.Designs
         }
         public override IXmlElementConvertible FromXmlElement(XElement element)
         {
-            Image = new BitmapImage(new Uri(element.Element("Image").Value));
+            var sourceUri = new Uri(element.Element("Image").Value);
+            var sourceFile = new System.IO.FileInfo(sourceUri.LocalPath);
+            var sourceFilePath = "";
+            if (!sourceFile.Exists)
+            {
+                MessageBox.Show("File: " + sourceFile + " was not found.  Please select another image.");
+                var ofd = ProjectIOManager.GetImageFileDialog();
+                if (ofd.ShowDialog() == true)
+                {
+                    sourceFilePath = ofd.FileName;
+                }
+                else
+                {
+                    Image = new BitmapImage();
+                    LoadBasePropertiesFromXmlElement(element);
+                    return this;
+                }
+            }
+            else
+            {
+                sourceFilePath = sourceFile.FullName;
+            }
+            var imageUri = new Uri(sourceFilePath);            
+            Image = new BitmapImage(imageUri);
             LoadBasePropertiesFromXmlElement(element);
             return this;
         }

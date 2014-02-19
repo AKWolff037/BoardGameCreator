@@ -46,6 +46,7 @@ namespace BoardGameDesigner.UserControls
                 context.Template = new BitmapImage(new Uri(ofd.FileName));
                 context.DesignManager.Project.IsDirty = true;
                 imgMain.Source = context.Template;
+                _design.DesignManager.Project.Save();
             }
             else
             {
